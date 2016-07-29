@@ -1,39 +1,8 @@
-## Introduction
-This is a Dockerfile to build a container image for nginx and php-fpm, with the ability to pull website code from git. The container also has the ability to update templated files with variables passed to docker in order to update your settings. There is also support for lets encrypt SSL support.
+# docker-nginx-php-git
+Minimal base image for hosting Nginx + PHP-FPM powered websites with Automatic Git Deployment functionalities including Webhooks
 
-### Git repository
-The source files for this project can be found here: [https://github.com/ngineered/nginx-php-fpm](https://github.com/ngineered/nginx-php-fpm)
+## Configuration
 
-If you have any improvements please submit a pull request.
-### Docker hub repository
-The Docker hub build can be found here: [https://registry.hub.docker.com/u/richarvey/nginx-php-fpm/](https://registry.hub.docker.com/u/richarvey/nginx-php-fpm/)
-## Versions
-| Tag | Nginx | PHP | Alpine |
-|-----|-------|-----|--------|
-| latest | 1.10.1 | 5.6.23 | 3.4 |
-| php5 | 1.10.1 | 5.6.23 | 3.4 |
-| php7 | 1.10.1 | 7.0.8 | 3.4 |
-
-## Building from source
-To build from source you need to clone the git repo and run docker build:
-```
-git clone https://github.com/ngineered/nginx-php-fpm.git
-docker build -t nginx-php-fpm:latest .
-```
-
-## Pulling from Docker Hub
-Pull the image from docker hub rather than downloading the git repo. This prevents you having to build the image on every docker host:
-```
-docker pull richarvey/nginx-php-fpm:latest
-```
-
-## Running
-To simply run the container:
-```
-sudo docker run -d richarvey/nginx-php-fpm
-```
-
-You can then browse to ```http://<DOCKER_HOST>:8080``` to view the default install files. To find your ```DOCKER_HOST``` use the ```docker inspect``` to get the IP address.
 ### Available Configuration Parameters
 
 The following flags are a list of all the currently supported options that can be changed by passing in the variables to docker with the -e flag.
@@ -51,6 +20,8 @@ The following flags are a list of all the currently supported options that can b
  - **PHP_POST_MAX_SIZE** : Set a larger post_max_size, default is 100 Mb
  - **PHP_UPLOAD_MAX_FILESIZE** : Set a larger upload_max_filesize, default is 100 Mb
  - **DOMAIN** : Set domain name for Lets Encrypt scripts
+ - **GIT_HOOK_TOKEN** : Auth-Token used for the [docker-hook](https://github.com/schickling/docker-hook) listener
+
 
 ### Dynamically Pulling code from git
 One of the nice features of this container is its ability to pull code from a git repository with a couple of environmental variables passed at run time.
@@ -89,6 +60,15 @@ sudo docker exec -t <CONTAINER_NAME> /usr/bin/letsencrypt-renew
 ```
 ## Special Git Features
 You'll need some extra ENV vars to enable this feature. These are ```GIT_EMAIL``` and ```GIT_NAME```. This allows git to be set up correctly and allow the following commands to work.
+
+### docker-hook - Git Webhook
+
+`docker-hook` is preconfigured to listen to incoming HTTP requests on port 8555
+
+All you have to do is setup the **GIT_HOOK_TOKEN** env var, and any requests to `http://yourdomain:8555/<GIT_HOOK_TOKEN>` will trigger a Git pull
+
+More info on how it works here: [schickling/docker-hook](https://github.com/schickling/docker-hook)
+
 ### Push code to Git
 To push code changes made within the container back to git simply run:
 ```
@@ -136,3 +116,8 @@ All logs should now print out in stdout/stderr and are available via the docker 
 ```
 docker logs <CONTAINER_NAME>
 ```
+
+## Thanks to
+* [ngineered/nginx-php-fpm](https://github.com/ngineered/nginx-php-fpm) - Base Docker image and Git push/pull functionalities
+* [schickling/docker-hook](https://github.com/schickling/docker-hook) - Git Webhook listener
+
