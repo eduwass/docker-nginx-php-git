@@ -97,18 +97,27 @@ sed -i -e "s/^;clear_env = no$/clear_env = no/" ${fpm_conf} &&\
 ln -s /etc/php5/php.ini /etc/php5/conf.d/php.ini && \
 find /etc/php5/conf.d/ -name "*.ini" -exec sed -i -re 's/^(\s*)#(.*)/\1;\2/g' {} \;
 
+# Install/setup Python deps
+RUN pip install requests
+
 # Add Scripts
 ADD scripts/start.sh /start.sh
 ADD scripts/pull /usr/bin/pull
 ADD scripts/push /usr/bin/push
 ADD scripts/letsencrypt-setup /usr/bin/letsencrypt-setup
 ADD scripts/letsencrypt-renew /usr/bin/letsencrypt-renew
+ADD scripts/docker-hook /usr/bin/docker-hook
+ADD scripts/hook-listener /usr/bin/hook-listener
+
+# Setup permissions
 RUN chmod 755 /usr/bin/pull && chmod 755 /usr/bin/push && chmod 755 /usr/bin/letsencrypt-setup && chmod 755 /usr/bin/letsencrypt-renew && chmod 755 /start.sh
+RUN chmod +x /usr/bin/docker-hook
+RUN chmod +x /usr/bin/hook-listener
 
 # copy in code
 ADD src/ /var/www/html/
 
-EXPOSE 443 80
+EXPOSE 443 80 8555
 
 #CMD ["/usr/bin/supervisord", "-n", "-c",  "/etc/supervisord.conf"]
 CMD ["/start.sh"]
