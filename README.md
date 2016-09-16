@@ -31,7 +31,7 @@ One of the nice features of this container is its ability to pull code from a gi
 ### Preparing your SSH key
 The container expects you pass it the __SSH_KEY__ variable with a **base64** encoded private key. First generate your key and then make sure to add it to github and give it write permissions if you want to be able to push code back out the container. Then run:
 ```
-base64 -w 0 /path_to_your_key
+base64 /path_to_your_key
 ```
 **Note:** Copy the output be careful not to copy your prompt
 
