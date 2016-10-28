@@ -49,6 +49,13 @@ else
  echo php_flag[display_errors] = on >> /etc/php5/php-fpm.conf
 fi
 
+# Enable PHP short tag or not
+if [[ "$SHORT_TAG" != "1" ]] ; then
+ echo php_flag[short_open_tag] = off >> /etc/php5/php-fpm.conf
+else
+ echo php_flag[short_open_tag] = on >> /etc/php5/php-fpm.conf
+fi
+
 # Display Version Details or not
 if [[ "$HIDE_NGINX_HEADERS" == "0" ]] ; then
  sed -i "s/server_tokens off;/server_tokens on;/g" /etc/nginx/nginx.conf
