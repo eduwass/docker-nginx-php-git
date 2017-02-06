@@ -110,7 +110,7 @@ RUN pip install requests
 # Install WP-CLI
 RUN curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
 RUN chmod +x wp-cli.phar
-RUN sudo mv wp-cli.phar /usr/local/bin/wp
+RUN mv wp-cli.phar /usr/local/bin/wp
 
 # Add Scripts
 ADD scripts/start.sh /start.sh
