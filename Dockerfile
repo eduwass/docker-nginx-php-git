@@ -4,7 +4,6 @@ MAINTAINER ngineered <support@ngineered.co.uk>
 
 ENV php_conf /etc/php7/php.ini 
 ENV fpm_conf /etc/php7/php-fpm.d/www.conf
-ENV composer_hash 61069fe8c6436a4468d0371454cf38a812e451a14ab1691543f25a9627b97ff96d8753d92a00654c21e2212a5ae1ff36
 
 RUN echo @testing http://nl.alpinelinux.org/alpine/edge/testing >> /etc/apk/repositories && \
     sed -i -e "s/v3.4/edge/" /etc/apk/repositories && \
@@ -58,15 +57,11 @@ RUN echo @testing http://nl.alpinelinux.org/alpine/edge/testing >> /etc/apk/repo
     mkdir -p /var/www/app && \
     mkdir -p /run/nginx && \
     mkdir -p /var/log/supervisor && \
-    php7 -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" && \
-    php7 -r "if (hash_file('SHA384', 'composer-setup.php') === '${composer_hash}') { echo 'Installer verified'; } else { echo 'Installer corrupt'; unlink('composer-setup.php'); } echo PHP_EOL;" && \
-    php7 composer-setup.php --install-dir=/usr/bin --filename=composer && \
-    php7 -r "unlink('composer-setup.php');" && \
     pip install -U pip && \
     pip install -U certbot && \
     mkdir -p /etc/letsencrypt/webrootauth && \
     apk del gcc musl-dev linux-headers libffi-dev augeas-dev python-dev
-
+    
 ADD conf/supervisord.conf /etc/supervisord.conf
 
 # Copy our nginx config
@@ -109,6 +104,13 @@ RUN sed -i \
     ln -s /etc/php7/php.ini /etc/php7/conf.d/php.ini && \
     find /etc/php7/conf.d/ -name "*.ini" -exec sed -i -re 's/^(\s*)#(.*)/\1;\2/g' {} \;
 
+# Install/setup Python deps
+RUN pip install requests
+
+# Install WP-CLI
+RUN curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
+RUN chmod +x wp-cli.phar
+RUN sudo mv wp-cli.phar /usr/local/bin/wp
 
 # Add Scripts
 ADD scripts/start.sh /start.sh
@@ -116,15 +118,18 @@ ADD scripts/pull /usr/bin/pull
 ADD scripts/push /usr/bin/push
 ADD scripts/letsencrypt-setup /usr/bin/letsencrypt-setup
 ADD scripts/letsencrypt-renew /usr/bin/letsencrypt-renew
+ADD scripts/docker-hook /usr/bin/docker-hook
+ADD scripts/hook-listener /usr/bin/hook-listener
+
+# Setup permissions
 RUN chmod 755 /usr/bin/pull && chmod 755 /usr/bin/push && chmod 755 /usr/bin/letsencrypt-setup && chmod 755 /usr/bin/letsencrypt-renew && chmod 755 /start.sh
+RUN chmod +x /usr/bin/docker-hook
+RUN chmod +x /usr/bin/hook-listener
 
 # copy in code
 ADD src/ /var/www/html/
-ADD errors/ /var/www/errors
 
-VOLUME /var/www/html
-
-EXPOSE 443 80
+EXPOSE 443 80 8555
 
 #CMD ["/usr/bin/supervisord", "-n", "-c",  "/etc/supervisord.conf"]
 CMD ["/start.sh"]
