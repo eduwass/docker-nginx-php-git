@@ -66,7 +66,7 @@ RUN echo @testing http://nl.alpinelinux.org/alpine/edge/testing >> /etc/apk/repo
     pip install -U certbot && \
     mkdir -p /etc/letsencrypt/webrootauth && \
     apk del gcc musl-dev linux-headers libffi-dev augeas-dev python-dev
-    
+
 ADD conf/supervisord.conf /etc/supervisord.conf
 
 # Copy our nginx config
@@ -109,13 +109,6 @@ RUN sed -i \
     ln -s /etc/php7/php.ini /etc/php7/conf.d/php.ini && \
     find /etc/php7/conf.d/ -name "*.ini" -exec sed -i -re 's/^(\s*)#(.*)/\1;\2/g' {} \;
 
-# Install/setup Python deps
-RUN pip install requests
-
-# Install WP-CLI
-RUN curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
-RUN chmod +x wp-cli.phar
-RUN sudo mv wp-cli.phar /usr/local/bin/wp
 
 # Add Scripts
 ADD scripts/start.sh /start.sh
@@ -123,18 +116,15 @@ ADD scripts/pull /usr/bin/pull
 ADD scripts/push /usr/bin/push
 ADD scripts/letsencrypt-setup /usr/bin/letsencrypt-setup
 ADD scripts/letsencrypt-renew /usr/bin/letsencrypt-renew
-ADD scripts/docker-hook /usr/bin/docker-hook
-ADD scripts/hook-listener /usr/bin/hook-listener
-
-# Setup permissions
 RUN chmod 755 /usr/bin/pull && chmod 755 /usr/bin/push && chmod 755 /usr/bin/letsencrypt-setup && chmod 755 /usr/bin/letsencrypt-renew && chmod 755 /start.sh
-RUN chmod +x /usr/bin/docker-hook
-RUN chmod +x /usr/bin/hook-listener
 
 # copy in code
 ADD src/ /var/www/html/
+ADD errors/ /var/www/errors
 
-EXPOSE 443 80 8555
+VOLUME /var/www/html
+
+EXPOSE 443 80
 
 #CMD ["/usr/bin/supervisord", "-n", "-c",  "/etc/supervisord.conf"]
 CMD ["/start.sh"]
