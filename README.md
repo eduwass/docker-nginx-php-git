@@ -122,6 +122,7 @@ docker logs <CONTAINER_NAME>
 ```
 
 ## Thanks to
+* [eduwass/docker-nginx-php-git](https://github.com/eduwass/docker-nginx-php-git) - Enhanced docker image with docker hook
 * [ngineered/nginx-php-fpm](https://github.com/ngineered/nginx-php-fpm) - Base Docker image and Git push/pull functionalities
 * [schickling/docker-hook](https://github.com/schickling/docker-hook) - Git Webhook listener
 
