@@ -22,6 +22,7 @@ The following flags are a list of all the currently supported options that can b
  - **PHP_UPLOAD_MAX_FILESIZE** : Set a larger upload_max_filesize, default is 100 Mb
  - **DOMAIN** : Set domain name for Lets Encrypt scripts
  - **GIT_HOOK_TOKEN** : Auth-Token used for the [docker-hook](https://github.com/schickling/docker-hook) listener
+ - **DOCKER_HOOK_PROXY** : Set to 1 to enable `/docker-hook` as an endpoint on your nginx site
 
 
 ### Dynamically Pulling code from git
@@ -67,6 +68,8 @@ You'll need some extra ENV vars to enable this feature. These are ```GIT_EMAIL``
 `docker-hook` is preconfigured to listen to incoming HTTP requests on port 8555
 
 All you have to do is setup the **GIT_HOOK_TOKEN** env var, and any requests to `http://yourdomain:8555/<GIT_HOOK_TOKEN>` will trigger a Git pull
+
+You can also enable docker-hook on your default nginx ports with **DOCKER_HOOK_PROXY**.  If enabled, you can POST your github webhook to `http(s)://yourdomain/docker-hook/<GIT_HOOK_TOKEN>` without using port 8555.
 
 More info on how it works here: [schickling/docker-hook](https://github.com/schickling/docker-hook)
 
