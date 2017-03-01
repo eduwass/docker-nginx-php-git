@@ -44,16 +44,16 @@ fi
 
 # Display PHP error's or not
 if [[ "$ERRORS" != "1" ]] ; then
- echo php_flag[display_errors] = off >> /etc/php7/php-fpm.conf
+ echo display_errors = Off >> /etc/php7/conf.d/php.ini
 else
- echo php_flag[display_errors] = on >> /etc/php7/php-fpm.conf
+ echo display_errors = On >> /etc/php7/conf.d/php.ini
 fi
 
 # Enable PHP short tag or not
 if [[ "$SHORT_TAG" != "1" ]] ; then
- echo php_flag[short_open_tag] = off >> /etc/php7/php-fpm.conf
+ echo short_open_tag = Off >> /etc/php7/conf.d/php.ini
 else
- echo php_flag[short_open_tag] = on >> /etc/php7/php-fpm.conf
+ echo short_open_tag = On >> /etc/php7/conf.d/php.ini
 fi
 
 # Display Version Details or not
