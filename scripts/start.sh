@@ -63,6 +63,12 @@ else
  sed -i "s/expose_php = On/expose_php = Off/g" /etc/php7/conf.d/php.ini
 fi
 
+# Enable proxy for Docker-Hook at /docker-hook/
+if [[ "$DOCKER_HOOK_PROXY" != "1" ]] ; then
+ sed -i '/location \/docker-hook/,/.*\}/d' /etc/nginx/sites-available/default.conf
+ sed -i '/location \/docker-hook/,/.*\}/d' /etc/nginx/sites-available/default-ssl.conf
+fi
+
 # Increase the memory_limit
 if [ ! -z "$PHP_MEM_LIMIT" ]; then
  sed -i "s/memory_limit = 128M/memory_limit = ${PHP_MEM_LIMIT}M/g" /etc/php7/conf.d/php.ini
